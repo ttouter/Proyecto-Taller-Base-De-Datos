@@ -26,7 +26,7 @@
     <main class="login-container">
         <div class="login-box">
             <div class="login-icon">⚙️</div>
-            <h2>Ingreso a entrenadores</h2>
+            <h2>Ingreso a administrador</h2>
             
 
             <form action="../../controllers/control_inicioSesionOrganizador.php" method="POST">
