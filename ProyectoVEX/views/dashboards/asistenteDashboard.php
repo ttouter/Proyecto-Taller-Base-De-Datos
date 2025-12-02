@@ -3,9 +3,20 @@ session_start();
 
 // Validar sesión
 if (!isset($_SESSION['asistente_logged_in']) || $_SESSION['asistente_logged_in'] !== true) {
-    header('Location: ../views/login/inicioSesion_entrenador.php');
+    header('Location: ../login/inicioSesion_entrenador.php');
     exit;
 }
+
+// =========================================================
+// NUEVO: Importar modelo y cargar listas para los selects
+// =========================================================
+require_once '../../models/ModeloProcesos.php';
+
+// Obtener lista de escuelas desde la BD (usando el SP ListarEscuelas)
+$listaEscuelas = ModeloProcesos::listarEscuelas();
+
+// Obtener lista de eventos desde la BD (usando el SP ListarEventos)
+$listaEventos = ModeloProcesos::listarEventos();
 
 $nombre_asistente = htmlspecialchars($_SESSION['asistente_nombre']);
 $id_asistente = $_SESSION['asistente_id'];
@@ -58,7 +69,20 @@ $id_asistente = $_SESSION['asistente_id'];
 
                 <div class="form-group">
                     <label for="codEscuela">Escuela de procedencia *</label>
-                    <input type="text" name="codEscuela" id="codEscuela" placeholder="Código de la escuela" required>
+                    
+                    <!-- CAMBIO: Select dinámico de Escuelas -->
+                    <select name="codEscuela" id="codEscuela" required>
+                        <option value="">-- Seleccione su escuela --</option>
+                        <?php if (!empty($listaEscuelas)): ?>
+                            <?php foreach ($listaEscuelas as $escuela): ?>
+                                <option value="<?php echo htmlspecialchars($escuela['codEscuela']); ?>">
+                                    <?php echo htmlspecialchars($escuela['nombreEscuela']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <option value="" disabled>No hay escuelas registradas</option>
+                        <?php endif; ?>
+                    </select>
                 </div>
 
                 <button type="submit" class="btn-primary">Guardar Información</button>
@@ -96,12 +120,39 @@ $id_asistente = $_SESSION['asistente_id'];
 
                     <div class="form-group">
                         <label for="evento">Evento *</label>
-                        <input type="text" id="evento" name="evento" required>
+                        
+                        <!-- CAMBIO: Select dinámico de Eventos -->
+                        <select id="evento" name="evento" required>
+                            <option value="">-- Seleccione el evento --</option>
+                            <?php if (!empty($listaEventos)): ?>
+                                <?php foreach ($listaEventos as $evento): ?>
+                                    <!-- El value es el nombre porque tu tabla Equipo usa nombre_Evento como FK -->
+                                    <option value="<?php echo htmlspecialchars($evento['nombre']); ?>">
+                                        <?php echo htmlspecialchars($evento['nombre']) . " (" . $evento['fecha'] . ")"; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="" disabled>No hay eventos disponibles</option>
+                            <?php endif; ?>
+                        </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="escuela">Código de escuela *</label>
-                        <input type="text" id="escuela" name="codEscuela" required>
+                        <label for="escuelaEquipo">Escuela del equipo *</label>
+                        
+                        <!-- CAMBIO: Select dinámico de Escuelas (Reutilizamos la lista) -->
+                        <select id="escuelaEquipo" name="codEscuela" required>
+                            <option value="">-- Seleccione la escuela --</option>
+                            <?php if (!empty($listaEscuelas)): ?>
+                                <?php foreach ($listaEscuelas as $escuela): ?>
+                                    <option value="<?php echo htmlspecialchars($escuela['codEscuela']); ?>">
+                                        <?php echo htmlspecialchars($escuela['nombreEscuela']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="" disabled>No hay escuelas registradas</option>
+                            <?php endif; ?>
+                        </select>
                     </div>
 
                 </div>
@@ -157,7 +208,8 @@ $id_asistente = $_SESSION['asistente_id'];
 
                     <div class="form-group">
                         <label for="equipo">ID del equipo *</label>
-                        <input type="number" name="idEquipo" id="equipo" required>
+                        <!-- NOTA: Idealmente esto también debería ser un Select cargado con los equipos del entrenador -->
+                        <input type="number" name="idEquipo" id="equipo" placeholder="ID generado al registrar equipo" required>
                     </div>
 
                 </div>
