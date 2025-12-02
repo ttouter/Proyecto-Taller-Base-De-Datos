@@ -1,6 +1,5 @@
 <?php
-require_once '../config/conexion.php';
-
+require_once __DIR__ . '/../config/conexion.php';
 class ModeloProcesos {
 
     // 1. COMPLETAR PERFIL ENTRENADOR

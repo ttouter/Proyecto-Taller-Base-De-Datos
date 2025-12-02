@@ -8,7 +8,6 @@ $pass = "";   // contraseña segura
 try {
     $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    echo "conexión exitosa";
 } catch (PDOException $e) {
     die("Error de conexión: " . $e->getMessage());
 }
